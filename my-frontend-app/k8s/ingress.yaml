@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: frontend-app-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: / # Nginx Ingress 特定注解，重写 URL 路径
+    # 如果您有多个 Ingress Controller，可能需要指定 Ingress Class
+    # kubernetes.io/ingress.class: "nginx"
+spec:
+  ingressClassName: nginx # 指定使用 Nginx Ingress Controller
+  rules:
+      http:
+        paths:
+          - path: / # 路由所有根路径流量
+            pathType: Prefix # 路径匹配类型
+            backend:
+              service:
+                name: frontend-app-service # 指向您的 Service
+                port:
+                  number: 80 # Service 的端口
