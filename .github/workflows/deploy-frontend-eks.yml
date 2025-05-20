@@ -43,6 +43,20 @@ jobs: # 定义工作流中的 Job
           # 使用 GitHub Secrets 获取 Secret Access Key
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+       
+      #调试步骤
+      - name: Debug - Verify AWS credentials and EKS access # <-- 添加这个步骤
+        run: |
+          echo "Verifying AWS credentials..."
+          aws sts get-caller-identity || { echo "ERROR: Failed to get caller identity. Check AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY."; exit 1; }
+          echo "AWS credentials verified successfully."
+
+          echo "Attempting to describe EKS cluster: ${{ env.EKS_CLUSTER_NAME }}"
+          aws eks describe-cluster --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }} || { echo "ERROR: Failed to describe EKS cluster. Check IAM permissions for EKS."; exit 1; }
+          echo "EKS cluster described successfully. Permissions should be fine."
+
+      
+
       - name: Login to Amazon ECR # 登录 ECR
         id: login-ecr # 为此步骤设置 ID，以便后续步骤访问其输出
         uses: aws-actions/amazon-ecr-login@v2  #自动登录到Amazon ECR
@@ -81,6 +95,8 @@ jobs: # 定义工作流中的 Job
         with:
           version: 'latest' # 安装最新版 kubectl
 
+      
+
       # 调试步骤
       - name: Debug - List Kubeconfig contents
         run: |
@@ -103,4 +119,3 @@ jobs: # 定义工作流中的 Job
           # 应用所有 k8s 目录下的 YAML 文件
           kubectl apply -f ${{ env.K8S_MANIFESTS_DIR }}
           echo "Kubernetes manifests applied to EKS."
-
