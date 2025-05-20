@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-app-deployment
+  namespace: default # 部署到 default 命名空间，可根据需要调整
+  labels:
+    app: frontend-app
+spec:
+  replicas: 2 # 运行 2 个 Pod 实例
+  selector:
+    matchLabels:
+      app: frontend-app
+  template:
+    metadata:
+      labels:
+        app: frontend-app
+    spec:
+      containers:
+        - name: frontend-app-container # 容器名称，需要与 GitHub Actions 中的 CONTAINER_NAME 变量对应
+          image: 588738573686.dkr.ecr.ap-southeast-1.amazonaws.com/test/testrepo/my-frontend-eks-repo:latest # 占位符，会被 GitHub Actions 替换
+          ports:
+            - containerPort: 80 # Nginx 默认监听 80 端口
+          resources: # 资源限制 (建议在生产环境配置)
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
