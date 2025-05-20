@@ -81,8 +81,26 @@ jobs: # 定义工作流中的 Job
         with:
           version: 'latest' # 安装最新版 kubectl
 
+      # 调试步骤
+      - name: Debug - List Kubeconfig contents
+        run: |
+          cat ~/.kube/config || true # 打印 kubeconfig 内容 (敏感信息，仅用于调试)
+          ls -la ~/.kube/ # 确认 kubeconfig 文件存在
+
+      - name: Debug - Test kubectl connection
+        run: |
+          kubectl cluster-info # 检查是否能连接到集群
+          kubectl auth can-i get pods -n default # 检查是否有权限获取 default 命名空间下的 pods
+
+      - name: Debug - List manifest files
+        run: ls -la ${{ env.K8S_MANIFESTS_DIR }} # 确认 YAML 文件在正确的位置
+
+
+
+
       - name: Apply Kubernetes Manifests to EKS # 应用 Kubernetes 配置到 EKS 集群
         run: |
           # 应用所有 k8s 目录下的 YAML 文件
           kubectl apply -f ${{ env.K8S_MANIFESTS_DIR }}
           echo "Kubernetes manifests applied to EKS."
+
