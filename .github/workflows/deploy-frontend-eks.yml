@@ -81,10 +81,10 @@ jobs: # 定义工作流中的 Job
           echo "FULL_IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
 
       - name: Set up Kubeconfig for EKS
-        uses: aws-actions/amazon-eks-setup-kubeconfig@v1
-        with:
-          aws-region: ${{ env.AWS_REGION }}
-          cluster-name: ${{ env.EKS_CLUSTER_NAME }} 
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ env.AWS_REGION }} \
+            --name ${{ env.EKS_CLUSTER_NAME }}
 
       - name: Install kubectl # 安装 kubectl 命令行工具
         uses: azure/setup-kubectl@v3  #在工作流运行器上安装 kubectl
