@@ -3,7 +3,7 @@ name: Deploy Frontend to EKS # 工作流名称
 on: # 触发工作流的事件
   push:
     branches:
-      - main1 # 当代码推送到 main 分支时触发
+      - main # 当代码推送到 main 分支时触发
 
   workflow_dispatch: {} # 允许手动触发
 
