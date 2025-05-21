@@ -3,7 +3,7 @@ name: Deploy Frontend to EKS # 工作流名称
 on: # 触发工作流的事件
   push:
     branches:
-      - main # 当代码推送到 main 分支时触发
+      - main1 # 当代码推送到 main 分支时触发
 
   workflow_dispatch: {} # 允许手动触发
 
@@ -67,17 +67,13 @@ jobs: # 定义工作流中的 Job
         env:
           ECR_REGISTRY: 588738573686.dkr.ecr.ap-southeast-1.amazonaws.com  # 硬编码你的 ECR 注册表地址
           ECR_REPOSITORY: test/testrepo  # 硬编码你的 ECR 仓库路径
-          IMAGE_TAG: my-frontend-eks-repo  # 自定义镜像标签
+          IMAGE_TAG: latest  # 自定义镜像标签
         run: |
           # 构建 Docker 镜像（完整路径）
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f my-frontend-app/Dockerfile my-frontend-app/
-          
-          # 打 latest 标签
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
-      
+
           # 推送镜像（带自定义标签和 latest）
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
       
           # 输出镜像 URI 供后续步骤使用
           echo "FULL_IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:latest" >> $GITHUB_ENV
