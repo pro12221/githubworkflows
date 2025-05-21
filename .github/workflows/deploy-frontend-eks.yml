@@ -62,23 +62,25 @@ jobs: # 定义工作流中的 Job
         uses: aws-actions/amazon-ecr-login@v2  #自动登录到Amazon ECR
 
 
-      - name: Build and push Docker image to ECR # 构建 Docker 镜像并推送到 ECR
-        id: build-image # 为此步骤设置 ID
+      - name: Build and push Docker image to ECR
+        id: build-image
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }} # 从登录步骤获取 ECR 注册表 URI
-          IMAGE_TAG: my-frontend-eks-repo # 使用 commit SHA 作为镜像标签，确保唯一性
+          ECR_REGISTRY: 588738573686.dkr.ecr.ap-southeast-1.amazonaws.com  # 硬编码你的 ECR 注册表地址
+          ECR_REPOSITORY: test/testrepo  # 硬编码你的 ECR 仓库路径
+          IMAGE_TAG: my-frontend-eks-repo  # 自定义镜像标签
         run: |
-          # 构建 Docker 镜像
+          # 构建 Docker 镜像（完整路径）
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f my-frontend-app/Dockerfile my-frontend-app/
-          # 为方便起见，也打一个 latest 标签 (如果 ECR 仓库设置为 mutable 且您需要 latest)
+          
+          # 打 latest 标签
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
-
-          # 推送 Docker 镜像
+      
+          # 推送镜像（带自定义标签和 latest）
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest # 如果需要
-
-          # 将完整的镜像 URI 输出，供后续步骤使用
-          echo "FULL_IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+      
+          # 输出镜像 URI 供后续步骤使用
+          echo "FULL_IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:latest" >> $GITHUB_ENV
 
       - name: Set up Kubeconfig for EKS
         run: |
